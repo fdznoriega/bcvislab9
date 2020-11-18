@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vega-Lite Lab</title>
+
+    <!-- Milligram CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+
+    <!-- You CSS rules-->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Vega Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.17.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.17.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.12.2"></script>
+
+    <style media="screen">
+      /* Add space between Vega-Embed links  */
+      .vega-actions a {
+        margin-right: 5px;
+      }
+    </style>
+
+  </head>
+  
+  <body>
+
+    <h1>Vega Lite Demo: COVID-19 Cases </h1>
+
+    <div id="vis"></div>
+
+    <script>
+      // Assign the specification to a local variable vlSpec.
+      var vlSpec = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+        "data": 
+        { 
+          "url": "https://api.covidtracking.com/v1/states/current.csv" 
+        },
+        "title": 
+        {
+          "text": "COVID-19: Cases & Casualties in the US", 
+          "anchor": "middle"
+        },
+        "vconcat": [
+          {
+            "width": 600,
+            "height": 300,
+            "mark": {"type": "point", "tooltip": true},
+            "selection": 
+            {
+              "brush": {"type":"interval"} 
+            },
+            "encoding": 
+            {
+              "x": 
+              {
+                "field": "positive",
+                "type": "quantitative",
+                "title": "positive cases"
+              },
+              "y": 
+              {
+                "field": "death",
+                "type": "quantitative",
+                "title": "total deaths"
+              },
+              "color": {"field": "dataQualityGrade", "type": "nominal"}
+            }
+          },
+          {
+            "repeat": ["hospitalizedCumulative", "recovered"],
+            "transform": 
+            [{
+              "filter": {"selection":"brush"}
+            }],
+            "columns": 1,
+            "spec":{
+              "width": 600,
+              "height": 100,
+              "mark": "bar",
+              "encoding": {
+                "x": {"field": "state", "type": "nominal"},
+                "y": 
+                  {
+                    "field": {"repeat":"repeat"}, 
+                    "type":"quantitative"
+                  }
+              }
+
+            }
+          }
+        ]
+
+      };
+
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis', vlSpec);
+    </script>
+   
+  </body>
+</html>
